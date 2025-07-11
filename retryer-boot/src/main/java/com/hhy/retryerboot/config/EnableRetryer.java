@@ -12,7 +12,4 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import(RetryerPostProcessor.class)
-public @interface EnableRetryer {
-
-
-}
+public @interface EnableRetryer { }

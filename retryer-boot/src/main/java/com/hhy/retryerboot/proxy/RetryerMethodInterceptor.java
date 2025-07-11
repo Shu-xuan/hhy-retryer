@@ -17,6 +17,9 @@ import java.util.Map;
 public class RetryerMethodInterceptor implements MethodInterceptor {
     private Object target;
 
+    /**
+     * 需要被重试的方法的映射表
+     */
     private Map<Integer, Retryer> retryerHashMap;
 
     public RetryerMethodInterceptor() {}
@@ -31,18 +34,20 @@ public class RetryerMethodInterceptor implements MethodInterceptor {
         final int hashCode = method.hashCode();
         // 需要重试的方法则进行重试
         if (retryerHashMap.containsKey(hashCode)) {
-            System.out.println(method.getDeclaringClass() + "#" + method.getName() + " 进行 [Retryer] 重试");
+//            System.out.println(method.getDeclaringClass() + "#" + method.getName() + " 进行 [Retryer] 重试");
+            // 交给重试器去执行
             return retryerHashMap.get(hashCode).exec(() -> {
-                final Object o1;
+                final Object result;
                 try {
-                    o1 = methodProxy.invokeSuper(o, objects);
+                    result = methodProxy.invokeSuper(o, objects);
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
-                return o1;
+                return result;
             });
         }
 
+        // 直接执行目标方法
         return methodProxy.invokeSuper(o, objects);
     }
 

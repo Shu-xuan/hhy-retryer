@@ -8,14 +8,17 @@ package com.hhy.retryer.predicate;
  * @Author hhy
  */
 public class ThrowsPredicate<T> implements IPredicate<T> {
-    private final Class<? extends Throwable> throwable;
+    /**
+     * 预期抛出的异常
+     */
+    private final Class<? extends Throwable> expectedThrowable;
 
-    public ThrowsPredicate(Class<? extends Throwable> throwable) {
-        this.throwable = throwable;
+    public ThrowsPredicate(Class<? extends Throwable> expectedThrowable) {
+        this.expectedThrowable = expectedThrowable;
     }
 
     @Override
     public boolean apply(T input) {
-        return throwable.equals(input);
+        return expectedThrowable.equals(input.getClass());
     }
 }

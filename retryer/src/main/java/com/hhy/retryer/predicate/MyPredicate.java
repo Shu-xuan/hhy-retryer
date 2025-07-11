@@ -14,11 +14,11 @@ public class MyPredicate<T> {
     public static Predicate throwsTo(Class<? extends Throwable> throwable) {
         return new ThrowsPredicate(throwable);
     }
-    public static Predicate equalsTo(Object object) {
-        return new EqualPredicate(object);
+    public static Predicate equalsTo(Object expectedVal) {
+        return new EqualPredicate(expectedVal);
     }
 
-    public static Predicate or(Predicate... predicates) {
+    public static Predicate anyOf(Predicate... predicates) {
         if (null == predicates || predicates.length == 0){
             return null;
         }

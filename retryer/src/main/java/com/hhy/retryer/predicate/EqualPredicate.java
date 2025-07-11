@@ -8,14 +8,18 @@ package com.hhy.retryer.predicate;
  * @Author hhy
  */
 public class EqualPredicate<T> implements IPredicate {
-    private final Object object;
+    /**
+     * 预期值
+     */
+    private final Object expectedVal;
 
-    public EqualPredicate(Object object) {
-        this.object = object;
+    public EqualPredicate(Object expectedVal) {
+        this.expectedVal = expectedVal;
     }
 
     @Override
     public boolean apply(Object input) {
-        return object.equals(input);
+        // 断言与传入的结果匹配
+        return expectedVal.equals(input);
     }
 }

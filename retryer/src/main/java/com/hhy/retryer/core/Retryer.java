@@ -52,9 +52,10 @@ public class Retryer {
     public <T> T exec(RetryerSupplier<T> supplier) {
         T result = null;
         try {
+            // 执行原始任务，获取返回结果
             result = supplier.exec();
             if (shouldRetry(result)) {
-                // 如果是异步执行器
+                // 传入了线程池就异步
                 if (null != executor) {
                     executor.execute(() -> {
                         if (execRetryStrategy()) {
@@ -69,6 +70,8 @@ public class Retryer {
             }
         } catch (Throwable throwable) {
             if (throwable instanceof RuntimeException) {
+                // 可能异常被封装，获取真实异常
+                // RuntimeException 没有包装其他异常时，这里返回的就是 null
                 throwable = throwable.getCause();
             }
             if (shouldRetry(throwable)) {
@@ -91,13 +94,15 @@ public class Retryer {
 
     private <T> void asyncExec(RetryerSupplier<T> supplier) {
         try {
-            T result = (T) supplier.exec();
+            // 执行原始逻辑
+            T result = supplier.exec();
             if (shouldRetry(result)) {
                 if (execRetryStrategy()) {
                     asyncExec(supplier);
                 }
             }
         } catch (Throwable throwable) {
+            // 可能异常被封装，获取真实异常
             if (throwable instanceof RuntimeException) {
                 throwable = throwable.getCause();
             }
@@ -112,8 +117,13 @@ public class Retryer {
     private boolean execRetryStrategy() {
         return retryerStrategy.exec0();
     }
-    private <T> boolean shouldRetry(T result) {
+    private boolean shouldRetry(Object result) {
         return null != predicateResult && ((IPredicate) predicateResult).apply(result);
+    }
+
+    // 异常判断重试
+    private boolean shouldRetry(Throwable e) {
+        return null != predicateThrowsException && ((IPredicate) predicateThrowsException).apply(e);
     }
 
     private void reset(){
@@ -123,9 +133,9 @@ public class Retryer {
     public static class Builder {
         private RetryerStrategy retryerStrategy;
 
-        private Predicate predicateResult;
+        private Predicate<Object> predicateResult;
 
-        private Predicate predicateThrowsException;
+        private Predicate<Throwable> predicateThrowsException;
 
         private RetryerListener retryerListener;
 
@@ -150,7 +160,7 @@ public class Retryer {
             return this;
         }
 
-        public Builder retryerExecStrategy(ExecutorService executorService){
+        public Builder retryerExecutor(ExecutorService executorService){
             this.executorService = executorService;
             return this;
         }

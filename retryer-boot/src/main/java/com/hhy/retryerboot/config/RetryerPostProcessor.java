@@ -97,13 +97,13 @@ public class RetryerPostProcessor implements BeanPostProcessor, ApplicationConte
                 throw new RuntimeException(e);
             }
         }
-        final Predicate resultPredicateObject = MyPredicate.or(resultPredicates);
+        final Predicate resultPredicateObject = MyPredicate.anyOf(resultPredicates);
 
         final Predicate[] throwsPredicates = new Predicate[throwsColl.length];
         for (int i = 0; i < throwsPredicates.length; i++) {
             throwsPredicates[i] = MyPredicate.throwsTo(throwsColl[i]);
         }
-        final Predicate throwsResultPredicateObject = MyPredicate.or(throwsPredicates);
+        final Predicate throwsResultPredicateObject = MyPredicate.anyOf(throwsPredicates);
 
         // 线程池
         Object threadPoll = null;
